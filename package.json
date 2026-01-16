@@ -1,0 +1,44 @@
+{
+  "name": "ensenas-collection-api",
+  "version": "1.0.0",
+  "description": "Node.js/Express backend service for EnSeñas AI data pipeline.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gloweldev/ensenas-collection-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Gloweldev/ensenas-collection-api/issues"
+  },
+  "homepage": "https://github.com/Gloweldev/ensenas-collection-api#readme",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.969.0",
+    "@aws-sdk/s3-request-presigner": "^3.969.0",
+    "@prisma/client": "^5.22.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "firebase-admin": "^13.0.2",
+    "helmet": "^8.0.0",
+    "uuid": "^13.0.0",
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.8",
+    "nodemon": "^3.1.11",
+    "prisma": "^5.22.0",
+    "tsx": "^4.21.0"
+  }
+}

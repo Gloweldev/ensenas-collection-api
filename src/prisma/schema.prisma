@@ -1,0 +1,50 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  firebaseUid String @unique
+  email     String   @unique
+  name      String?
+  lastLoginAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  videos    Video[]
+  
+  @@map("users")
+}
+
+model Video {
+  id          String   @id @default(uuid())
+  s3Key       String   // S3 object key (not full URL for cloud-agnostic design)
+  signName    String
+  filename    String
+  contentType String
+  duration    Float?   // Duration in seconds
+  status      VideoStatus @default(PROCESSING)
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("videos")
+  @@index([userId])
+  @@index([signName])
+}
+
+enum VideoStatus {
+  PROCESSING
+  READY
+  FAILED
+}

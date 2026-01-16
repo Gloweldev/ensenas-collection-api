@@ -1,0 +1,92 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  firebaseUid String @unique
+  email     String   @unique
+  name      String?  // From Firebase displayName
+  lastLoginAt DateTime?
+  
+  // Onboarding fields
+  onboardingCompleted Boolean @default(false)
+  hearingStatus String? // 'deaf', 'hard_of_hearing', 'hearing', 'coda'
+  lsmVariant String?
+  ageRange String?
+  gender String?
+  
+  // Gamification fields
+  currentStreak Int @default(0)
+  lastContributionAt DateTime?
+  reputationScore Int @default(0) // Used to calculate level
+  
+  // Security
+  banned Boolean @default(false)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  recordings Recording[]
+  
+  @@map("users")
+}
+
+model Glossary {
+  id                 Int      @id @default(autoincrement())
+  slug               String   @unique // e.g., 'hola', 'necesitar'
+  category           String   // 'verb', 'noun', 'social', 'question', 'context'
+  videoReferenceUrl  String?  @map("video_reference_url") // URL to master reference video
+  priority           Int      @default(1) // 1-5 scale (1 = highest priority)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  recordings Recording[]
+  
+  @@map("glossary")
+}
+
+model Recording {
+  id          String   @id @default(uuid())
+  s3Key       String   // S3 object key (not full URL for cloud-agnostic design)
+  filename    String
+  contentType String
+  duration    Float?   // Duration in seconds
+  status      RecordingStatus @default(PENDING)
+  
+  // Video metadata: fps, resolution, device info, browser, etc.
+  metadata    Json?    @db.JsonB
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  glossaryId  Int
+  glossary    Glossary @relation(fields: [glossaryId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("recordings")
+  @@index([userId])
+  @@index([glossaryId])
+  @@index([status])
+}
+
+enum RecordingStatus {
+  UPLOADING
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSING
+}
+
