@@ -9,5 +9,6 @@ prisma/migrations/
 ensenasai-firebase-adminsdk-*.json
 *.json
 !package.json
+!package-lock.json
 !tsconfig.json
 !nodemon.json
