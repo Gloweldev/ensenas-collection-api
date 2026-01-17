@@ -208,11 +208,12 @@ const getMyRecordings = async (req, res, next) => {
         const limit = Math.min(parseInt(req.query.limit) || 20, 100);
         const status = req.query.status;
         const ids = req.query.ids; // Comma separated IDs
+        const glossaryId = req.query.glossaryId ? parseInt(req.query.glossaryId) : null;
         const skip = (page - 1) * limit;
 
         const where = { userId };
 
-        // Handle ID filtering for session restoration
+        // Handle ID filtering
         if (ids) {
             const idList = ids.split(',').filter(id => id.trim().length > 0);
             if (idList.length > 0) {
@@ -220,8 +221,20 @@ const getMyRecordings = async (req, res, next) => {
             }
         }
 
+        // Handle Assignment filtering (Session Restore)
+        if (glossaryId) {
+            where.glossaryId = glossaryId;
+            // When restoring a session, we typically want unsubmitted videos (PENDING or UPLOADING)
+            // But if status is explicitly provided, respect it.
+            // If not provided, we might default to retrieving valid session recordings.
+        }
+
         if (status) {
             where.status = status;
+        } else if (glossaryId && !ids) {
+            // Default for session restore: Get only UPLOADING (interrupted sessions)
+            // If status is PENDING, it means they are already submitted, so we don't restore them
+            where.status = 'UPLOADING';
         }
 
         const [recordings, total] = await Promise.all([
@@ -239,9 +252,10 @@ const getMyRecordings = async (req, res, next) => {
             prisma.recording.count({ where }),
         ]);
 
-        // Generate presigned URLs for preview if IDs were requested (session restore)
+        // Generate presigned URLs for preview if IDs were requested or if restoring session via glossaryId
         let recordingsWithUrls = recordings;
-        if (ids) {
+        // We want previews if we are fetching specific IDs or filtering by glossary (studio restore context)
+        if (ids || glossaryId) {
             recordingsWithUrls = await Promise.all(recordings.map(async (rec) => {
                 try {
                     // Generate download URL for 1 hour

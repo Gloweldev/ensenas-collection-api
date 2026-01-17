@@ -37,8 +37,16 @@ module.exports = {
 
     // Rate Limiting
     rateLimit: {
-        windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 900000, // 15 minutes
-        max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS, 10) || 100,
+        // General API (High traffic)
+        api: {
+            windowMs: 15 * 60 * 1000, // 15 minutes
+            max: parseInt(process.env.RATE_LIMIT_API_MAX, 10) || 1000,
+        },
+        // Auth (Strict security)
+        auth: {
+            windowMs: 15 * 60 * 1000, // 15 minutes
+            max: parseInt(process.env.RATE_LIMIT_AUTH_MAX, 10) || 20,
+        }
     },
 
     // Presigned URLs

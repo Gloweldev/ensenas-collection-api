@@ -3,7 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const config = require('./config');
 const routes = require('./routes');
-const rateLimiter = require('./middlewares/rateLimiter');
+const { apiLimiter } = require('./middlewares/limiters');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -24,8 +24,8 @@ app.use(cors({
     credentials: true,
 }));
 
-// Rate limiting
-app.use(rateLimiter);
+// Rate limiting (General API)
+app.use(apiLimiter);
 
 // Body parsing
 app.use(express.json());
