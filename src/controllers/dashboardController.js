@@ -41,8 +41,26 @@ const getDashboardData = async (req, res, next) => {
             });
         }
 
-        // Calculate stats
-        const totalGlossary = await prisma.glossary.count();
+        // RBAC Filter Config
+        const userRole = req.user.role;
+        const isAdmin = userRole === 'ADMIN';
+
+        const visibilityFilter = isAdmin ? {} : {
+            AND: [
+                { status: 'ACTIVE' },
+                {
+                    OR: [
+                        { visibility: 'PUBLIC' },
+                        { allowed_roles: { has: userRole } }
+                    ]
+                }
+            ]
+        };
+
+        // Calculate stats - filtered by visibility
+        const totalGlossary = await prisma.glossary.count({
+            where: visibilityFilter
+        });
 
         // Count distinct glossary items that user has contributed to (PENDING, PROCESSING, or APPROVED)
         // This means user has at least submitted videos for these words
@@ -65,10 +83,11 @@ const getDashboardData = async (req, res, next) => {
             ? Math.round((totalContributed / totalGlossary) * 100)
             : 0;
 
-        // Find next mission - exclude any glossary where user has already contributed
+        // Find next mission - exclude where user has contributed AND respect visibility
         const userContributedIds = Array.from(contributedGlossaryIds);
         const nextMission = await prisma.glossary.findFirst({
             where: {
+                ...visibilityFilter,
                 id: {
                     notIn: userContributedIds.length > 0 ? userContributedIds : [-1], // Prisma needs array
                 },
@@ -85,9 +104,10 @@ const getDashboardData = async (req, res, next) => {
             },
         });
 
-        // Get top 3 priority assignments - exclude where user has contributed
+        // Get top 3 priority assignments - exclude where user has contributed AND respect visibility
         const topPriorityAssignments = await prisma.glossary.findMany({
             where: {
+                ...visibilityFilter,
                 id: {
                     notIn: userContributedIds.length > 0 ? userContributedIds : [-1],
                 },

@@ -56,11 +56,22 @@ const authGuard = async (req, res, next) => {
         const decodedToken = await admin.auth().verifyIdToken(idToken);
 
         // Attach user info to request
-        req.user = {
-            uid: decodedToken.uid,
-            email: decodedToken.email,
-            name: decodedToken.name,
-        };
+        // Fetch full user from database to get Role and internal ID
+        const prisma = require('../lib/prisma');
+        const user = await prisma.user.findUnique({
+            where: { firebaseUid: decodedToken.uid },
+        });
+
+        if (!user) {
+            // Optional: Auto-create user if not exists (sync), or fail.
+            // For now, fail if not synced (assuming frontend calls sync endpoint first)
+            return res.status(401).json({
+                success: false,
+                error: 'User not synced with database'
+            });
+        }
+
+        req.user = user;
 
         next();
     } catch (error) {

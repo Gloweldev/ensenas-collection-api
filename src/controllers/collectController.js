@@ -10,10 +10,26 @@ const getAssignmentBySlug = async (req, res, next) => {
     try {
         const { slug } = req.params;
 
-        // Fetch glossary item by slug
-        const glossaryItem = await prisma.glossary.findUnique({
+        const userRole = req.user.role;
+        const isAdmin = userRole === 'ADMIN';
+
+        const visibilityFilter = isAdmin ? {} : {
+            AND: [
+                { status: 'ACTIVE' },
+                {
+                    OR: [
+                        { visibility: 'PUBLIC' },
+                        { allowed_roles: { has: userRole } }
+                    ]
+                }
+            ]
+        };
+
+        // Fetch glossary item by slug with visibility check
+        const glossaryItem = await prisma.glossary.findFirst({
             where: {
                 slug: slug,
+                ...visibilityFilter
             },
             select: {
                 id: true,

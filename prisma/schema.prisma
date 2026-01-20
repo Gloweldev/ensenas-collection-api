@@ -15,6 +15,7 @@ model User {
   firebaseUid String @unique
   email     String   @unique
   name      String?  // From Firebase displayName
+  role      UserRole @default(VOLUNTEER)
   lastLoginAt DateTime?
   
   // Onboarding fields
@@ -46,6 +47,10 @@ model Glossary {
   category           String   // 'verb', 'noun', 'social', 'question', 'context'
   videoReferenceUrl  String?  @map("video_reference_url") // URL to master reference video
   priority           Int      @default(1) // 1-5 scale (1 = highest priority)
+  
+  status         GlossaryStatus     @default(DRAFT)
+  visibility     GlossaryVisibility @default(PUBLIC)
+  allowed_roles  UserRole[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -82,11 +87,28 @@ model Recording {
   @@index([status])
 }
 
+
 enum RecordingStatus {
   UPLOADING
   PENDING
   APPROVED
   REJECTED
   PROCESSING
+}
+
+enum UserRole {
+  ADMIN
+  VOLUNTEER
+}
+
+enum GlossaryStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum GlossaryVisibility {
+  PUBLIC
+  RESTRICTED
 }
 

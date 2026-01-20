@@ -10,8 +10,27 @@ const getAssignments = async (req, res, next) => {
     try {
         const userId = req.user.id;
 
+        // RBAC Filter Logic
+        const userRole = req.user.role;
+        const isAdmin = userRole === 'ADMIN';
+
+        const whereClause = {};
+
+        if (!isAdmin) {
+            whereClause.AND = [
+                { status: 'ACTIVE' },
+                {
+                    OR: [
+                        { visibility: 'PUBLIC' },
+                        { allowed_roles: { has: userRole } }
+                    ]
+                }
+            ];
+        }
+
         // Fetch all glossary items with user's recordings
         const glossaryItems = await prisma.glossary.findMany({
+            where: whereClause,
             orderBy: [
                 { priority: 'asc' }, // Higher priority first (1 is highest)
                 { slug: 'asc' },
