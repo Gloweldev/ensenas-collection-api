@@ -44,6 +44,7 @@ model User {
 model Glossary {
   id                 Int      @id @default(autoincrement())
   slug               String   @unique // e.g., 'hola', 'necesitar'
+  word               String   @default("") // Display text with accents (e.g. 'Niño')
   category           String   // 'verb', 'noun', 'social', 'question', 'context'
   videoReferenceUrl  String?  @map("video_reference_url") // URL to master reference video
   priority           Int      @default(1) // 1-5 scale (1 = highest priority)

@@ -12,3 +12,8 @@ ensenasai-firebase-adminsdk-*.json
 !package-lock.json
 !tsconfig.json
 !nodemon.json
+
+# Local Data Imports
+/imports
+/scripts
+

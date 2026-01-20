@@ -66,6 +66,7 @@ const getAssignments = async (req, res, next) => {
             return {
                 id: item.id,
                 slug: item.slug, // For URL: /collect/{slug}
+                word: item.word, // Display Text (e.g. "Niño")
                 category: item.category, // For UI display
                 status: status, // For filtering tabs
             };

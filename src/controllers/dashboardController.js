@@ -99,6 +99,7 @@ const getDashboardData = async (req, res, next) => {
             select: {
                 id: true,
                 slug: true,
+                word: true, // Display Text
                 category: true,
                 priority: true,
             },
@@ -120,6 +121,7 @@ const getDashboardData = async (req, res, next) => {
             select: {
                 id: true,
                 slug: true,
+                word: true, // Display Text
                 category: true,
                 priority: true,
             },
@@ -148,6 +150,7 @@ const getDashboardData = async (req, res, next) => {
                     nextMission: nextMission ? {
                         id: nextMission.id,
                         slug: nextMission.slug,
+                        word: nextMission.word,
                         category: nextMission.category,
                         priority: nextMission.priority,
                     } : null,
@@ -155,6 +158,7 @@ const getDashboardData = async (req, res, next) => {
                 priorityAssignments: topPriorityAssignments.map(a => ({
                     id: a.id,
                     slug: a.slug,
+                    word: a.word,
                     category: a.category,
                     priority: a.priority,
                 })),

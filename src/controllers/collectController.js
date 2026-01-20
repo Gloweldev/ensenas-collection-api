@@ -34,6 +34,7 @@ const getAssignmentBySlug = async (req, res, next) => {
             select: {
                 id: true,
                 slug: true,
+                word: true,
                 category: true,
                 videoReferenceUrl: true,
                 priority: true,
