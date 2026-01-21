@@ -22,6 +22,8 @@ model User {
   hearingStatus       String?
   lsmVariant          String?
   onboardingCompleted Boolean     @default(false)
+  termsAcceptedAt     DateTime?
+  termsAccepted       Boolean     @default(false)
   currentStreak       Int         @default(0)
   lastContributionAt  DateTime?
   reputationScore     Int         @default(0)

@@ -17,12 +17,18 @@ const loginOrRegister = async (req, res, next) => {
                 lastLoginAt: new Date(),
                 // Optionally update name if it changed in Firebase
                 ...(name && { name }),
+                ...(req.body.termsAcceptedAt && {
+                    termsAcceptedAt: req.body.termsAcceptedAt,
+                    termsAccepted: true
+                }),
             },
             create: {
                 firebaseUid: uid,
                 email: email,
                 name: name || null,
                 lastLoginAt: new Date(),
+                termsAcceptedAt: req.body.termsAcceptedAt || null,
+                termsAccepted: !!req.body.termsAcceptedAt,
             },
         });
 
