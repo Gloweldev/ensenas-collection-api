@@ -32,6 +32,7 @@ const loginOrRegister = async (req, res, next) => {
                 id: user.id,
                 email: user.email,
                 name: user.name,
+                role: user.role,
                 createdAt: user.createdAt,
                 lastLoginAt: user.lastLoginAt,
             },

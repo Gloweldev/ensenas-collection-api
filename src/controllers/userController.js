@@ -84,13 +84,8 @@ const getUserProfile = async (req, res, next) => {
                 id: true,
                 email: true,
                 name: true,
-                hearingStatus: true,
-                lsmVariant: true,
-                ageRange: true,
-                gender: true,
+                role: true,
                 onboardingCompleted: true,
-                lastLoginAt: true,
-                createdAt: true,
             },
         });
 
